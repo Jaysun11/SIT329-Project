@@ -1,8 +1,9 @@
 module DHT11READER(
-	input  sys_clk,
+	input  clk,
 	input rst_n,
 	inout dht11,//dht11 
-	output reg [31:0] data_valid//validator for data
+	output reg [31:0] data_valid,//validator for data
+	output reg [7:0] LED // array of 8 LEDs
 );
 
 //parameters
@@ -20,6 +21,7 @@ parameter st_rec_data = 3'd5;//Receive 40-bit data
 parameter st_delay = 3'd6;//Delay and wait, re-operate DHT11 after the delay is complete
 
 //reg define 
+reg [7:0] temp_integer = 8'd0;
 
 reg [2:0] cur_state;//current state
 
@@ -55,7 +57,7 @@ assign dht11_neg = dht11_d1 & ~dht11_d0;//collect the falling edge
 //Use the counter from 0 technology to 50/2-1 even frequency division N/2-1
 //This project uses The 1M frequency division is because the DHT11 timing is mainly in us.
 
-always @(posedge sys_clk or negedge rst_n) begin
+always @(posedge clk or negedge rst_n) begin
 
 if (!rst_n)
 
@@ -278,8 +280,42 @@ else
 			if(data_cnt == 40) 
 				begin//data transmission is over, verify check digit
                 next_state <= st_delay;
+					 
+					 
+					 /*Data format
+					 
+					 **Data format: **
+					 8-digit humidity integer data+
+					 8-digit humidity decimal data+
+					 8-digit temperature integer data+
+					 8-digit temperature decimal data+
+					 8bit checksum. 
+					 
+					 When the data is transmitted correctly, the checksum data is equal to the last 8 digits of the result of "8-digit humidity integer data 
+					 + 8-digit humidity decimal data + 8-digit temperature integer data 
+					 + 8-digit temperature decimal data". 
+					 
+					 The highest digit of the temperature decimal data is the sign bit of the temperature, 
+					 the highest digit of the decimal is 1, 
+					 which means the measured temperature is negative, 
+					 and the highest digit of the temperature decimal is 0,
+					 which means the measured temperature is positive.
+					
+					
+					 
+					 */
                 if(data_temp[7:0] == data_temp[39:32] + data_temp[31:24] + data_temp[23:16] + data_temp[15:8])
-                    data_valid <= data_temp[39:8];  
+                    data_valid <= data_temp[39:8];
+						  
+						  						 
+						  temp_integer = data_temp[16];
+						  temp_integer = temp_integer + (data_temp[17] * 1);
+						  temp_integer = temp_integer + (data_temp[18] * 1);
+						  temp_integer = temp_integer + data_temp[19] * 10;
+					
+						  LED = temp_integer;
+
+						  
 				end
 	end 
 		
@@ -298,7 +334,6 @@ else
     endcase
 	end 
 end		
-			
-			
+
 
 endmodule

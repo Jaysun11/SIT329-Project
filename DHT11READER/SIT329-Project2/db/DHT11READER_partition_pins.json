@@ -132,6 +132,22 @@
 					"strict" : false
 				},
 				{
+					"name" : "LED[0]",
+					"strict" : false
+				},
+				{
+					"name" : "LED[1]",
+					"strict" : false
+				},
+				{
+					"name" : "LED[2]",
+					"strict" : false
+				},
+				{
+					"name" : "LED[3]",
+					"strict" : false
+				},
+				{
 					"name" : "dht11",
 					"strict" : false
 				},
@@ -140,7 +156,7 @@
 					"strict" : false
 				},
 				{
-					"name" : "sys_clk",
+					"name" : "clk",
 					"strict" : false
 				}
 			]
