@@ -40,6 +40,8 @@ namespace M2MqttUnity
     /// </summary>
     public class M2MqttUnityClient : MonoBehaviour
     {
+        public Boolean status = false;
+
         [Header("MQTT broker configuration")]
         [Tooltip("IP address or URL of the host running the broker")]
         public string brokerAddress = "localhost";
@@ -89,6 +91,16 @@ namespace M2MqttUnity
             {
                 StartCoroutine(DoConnect());
             }
+        }
+
+        public virtual void Jumping()
+        {
+            this.status = true;
+        }
+
+        public virtual void Standing()
+        {
+            this.status = false;
         }
 
         /// <summary>
